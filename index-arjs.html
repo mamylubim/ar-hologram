@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Голограмма - AR.js версия</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            font-size: 14px;
+            max-width: 300px;
+            line-height: 1.6;
+        }
+        .arjs-loader {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .arjs-loader div {
+            text-align: center;
+            font-size: 1.25em;
+            color: white;
+        }
+        
+        /* Скрываем все debug элементы AR.js */
+        .arjs-debug,
+        .arjs-debugUI,
+        [data-arjs],
+        canvas[data-arjs] {
+            display: none !important;
+        }
+        
+        /* Скрываем круги и другие debug элементы */
+        a-scene canvas {
+            display: block !important;
+        }
+        
+        /* Убираем все overlay элементы */
+        .a-enter-vr-button,
+        .a-orientation-modal {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="info" id="info">
+        Наведите камеру на маркер Hiro<br>
+        Или используйте маркерлесс режим
+    </div>
+    
+    <!-- Loader пока AR.js загружается -->
+    <div class="arjs-loader" id="loader">
+        <div>Загрузка AR... Разрешите доступ к камере</div>
+    </div>
+    
+    <!-- A-Frame сцена с AR.js -->
+    <a-scene
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true;"
+        embedded
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; videoTexture: true;"
+    >
+        <!-- Маркер Hiro (распечатайте маркер) -->
+        <a-marker preset="hiro" raycaster="objects: .clickable" emitevents="true">
+            <!-- Видео голограмма на маркере -->
+            <a-video
+                src="#video-source"
+                position="0 0.5 0"
+                rotation="0 0 0"
+                width="1.5"
+                height="1.125"
+                opacity="0.9"
+                material="shader: flat; transparent: true;"
+                geometry="primitive: plane"
+                class="clickable"
+                animation__float="property: position; to: 0 0.7 0; loop: true; dur: 2000; direction: alternate"
+            ></a-video>
+            
+            <!-- Эффект голограммы (отключен) -->
+            <!-- <a-plane
+                position="0 0.5 0.01"
+                rotation="0 0 0"
+                width="2"
+                height="1.5"
+                material="shader: flat; transparent: true; opacity: 0.3; color: #00ffff"
+                geometry="primitive: plane"
+            ></a-plane> -->
+        </a-marker>
+        
+        <!-- Маркерлесс режим (видео в воздухе) -->
+        <a-entity id="rig" position="0 0 0">
+            <a-video
+                src="#video-source"
+                position="0 1.5 -1.5"
+                rotation="0 0 0"
+                width="2"
+                height="1.5"
+                opacity="0.9"
+                material="shader: flat; transparent: true;"
+                geometry="primitive: plane"
+                animation__float="property: position; to: 0 1.8 -1.5; loop: true; dur: 2000; direction: alternate"
+            ></a-video>
+            
+            <!-- Эффект голограммы (отключен) -->
+            <!-- <a-plane
+                position="0 1.5 -0.99"
+                rotation="0 0 0"
+                width="3"
+                height="2.25"
+                material="shader: flat; transparent: true; opacity: 0.3; color: #00ffff"
+                geometry="primitive: plane"
+            ></a-plane> -->
+        </a-entity>
+        
+        <!-- Видео источник -->
+        <video
+            id="video-source"
+            autoplay
+            loop
+            playsinline
+            webkit-playsinline
+            muted
+            preload="auto"
+            style="display: none;"
+        >
+            <source src="./video.mp4" type="video/mp4">
+            <source src="video.mp4" type="video/mp4">
+        </video>
+        
+        <!-- Камера -->
+        <a-entity camera></a-entity>
+    </a-scene>
+    
+    <!-- AR.js библиотеки по официальной документации -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <!-- Marker Based версия AR.js -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
+    <script>
+        // Скрываем loader когда AR.js загрузится
+        const scene = document.querySelector('a-scene');
+        const loader = document.getElementById('loader');
+        const info = document.getElementById('info');
+        
+        scene.addEventListener('loaded', function() {
+            console.log('A-Frame сцена загружена');
+            setTimeout(() => {
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+                if (info) {
+                    info.textContent = '✅ AR готов! Наведите на маркер или используйте маркерлесс режим';
+                }
+            }, 1000);
+        });
+        
+        // Обработка маркера
+        const marker = document.querySelector('a-marker');
+        if (marker) {
+            marker.addEventListener('markerFound', function() {
+                console.log('Маркер найден!');
+                if (info) {
+                    info.textContent = '✅ Маркер найден! Голограмма активна';
+                }
+            });
+            
+            marker.addEventListener('markerLost', function() {
+                console.log('Маркер потерян');
+                if (info) {
+                    info.textContent = 'Наведите камеру на маркер Hiro';
+                }
+            });
+        }
+        
+        // Запуск видео сразу при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('video-source');
+            
+            // Убеждаемся что видео зациклено
+            video.loop = true;
+            
+            // Загружаем видео
+            video.load();
+            
+            // Пытаемся запустить сразу
+            function startVideo() {
+                if (video.readyState >= 2) {
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log('✅ Видео запущено и зациклено');
+                        }).catch(e => {
+                            console.log('Автозапуск видео заблокирован, попробую еще раз:', e);
+                            // Пробуем еще раз через небольшую задержку
+                            setTimeout(startVideo, 500);
+                        });
+                    }
+                } else {
+                    // Видео еще не готово, ждем
+                    setTimeout(startVideo, 200);
+                }
+            }
+            
+            video.addEventListener('canplay', function() {
+                console.log('Видео готово к воспроизведению');
+                startVideo();
+            });
+            
+            video.addEventListener('canplaythrough', function() {
+                console.log('Видео полностью загружено');
+                startVideo();
+            });
+            
+            video.addEventListener('ended', function() {
+                // Если видео закончилось (хотя loop должен работать), перезапускаем
+                console.log('Видео закончилось, перезапускаю...');
+                video.currentTime = 0;
+                video.play();
+            });
+            
+            video.addEventListener('error', function(e) {
+                console.error('Ошибка загрузки видео:', e);
+                if (info) {
+                    info.textContent = '❌ Ошибка загрузки видео. Проверьте файл video.mp4';
+                }
+            });
+            
+            // Начинаем попытки запуска
+            startVideo();
+        });
+    </script>
+</body>
+</html>
+

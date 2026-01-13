@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Маркер для печати</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .marker-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .marker {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            border: 2px solid #333;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 10px;
+        }
+        
+        .instructions h2 {
+            margin-bottom: 15px;
+            color: #1976d2;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .print-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #1976d2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .print-button:hover {
+            background: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 AR Маркер для печати</h1>
+        
+        <div class="marker-container">
+            <h2>Маркер Hiro</h2>
+            <p>Распечатайте этот маркер на белой бумаге</p>
+            <div class="marker">
+                <img src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/HIRO.jpg" 
+                     alt="Hiro Marker" 
+                     style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+            <a href="javascript:window.print()" class="print-button">🖨️ Печать маркера</a>
+        </div>
+        
+        <div class="instructions">
+            <h2>📋 Как использовать:</h2>
+            <ol>
+                <li>Распечатайте маркер выше на белой бумаге (формат A4)</li>
+                <li>Убедитесь, что маркер хорошо виден и не поврежден</li>
+                <li>Откройте AR приложение на телефоне</li>
+                <li>Наведите камеру на распечатанный маркер</li>
+                <li>Голограмма появится над маркером</li>
+            </ol>
+            
+            <p style="margin-top: 20px; font-weight: bold; color: #d32f2f;">
+                ⚠️ Важно: Маркер должен быть хорошо освещен и полностью виден в кадре камеры!
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+
