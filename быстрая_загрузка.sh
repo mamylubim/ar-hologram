@@ -6,6 +6,9 @@ cd "/Users/admin/Desktop/Новая папка"
 
 echo "🔄 Загрузка изменений на GitHub..."
 
+# Сначала получаем изменения с GitHub
+git pull origin main --no-rebase > /dev/null 2>&1
+
 git add .
 git commit -m "Обновление: $(date '+%Y-%m-%d %H:%M:%S')" > /dev/null 2>&1
 
