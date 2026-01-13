@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать QR код</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        
+        .instructions {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 2;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        .qr-container {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .qr-container.show {
+            display: block;
+        }
+        
+        #qrcode {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            display: inline-block;
+            margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .print-btn {
+            background: #4CAF50;
+            margin-top: 20px;
+        }
+        
+        .print-btn:hover {
+            background: #45a049;
+        }
+        
+        .url-display {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .big-button {
+            display: block;
+            background: #1976d2;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Создать QR код</h1>
+        
+        <div class="instructions">
+            <h3>📋 Сначала загрузите файлы:</h3>
+            <ol>
+                <li>Откройте <a href="https://app.netlify.com/drop" target="_blank" style="color: #1976d2;">Netlify Drop</a></li>
+                <li>Перетащите папку "Новая папка" туда</li>
+                <li>Скопируйте ссылку и добавьте <code>/index.html</code></li>
+            </ol>
+        </div>
+        
+        <div>
+            <h3 style="color: #333; margin-bottom: 15px;">Вставьте вашу ссылку:</h3>
+            <input 
+                type="text" 
+                id="ar-url" 
+                placeholder="https://ваша-ссылка.netlify.app/index.html"
+                onkeypress="if(event.key==='Enter') generateQR()">
+            <br>
+            <button onclick="generateQR()">🎯 Создать QR код</button>
+        </div>
+        
+        <div class="qr-container" id="qr-container">
+            <h3 style="color: #333; margin: 20px 0;">✅ QR код готов!</h3>
+            <div id="qrcode"></div>
+            <div class="url-display" id="url-display"></div>
+            <button class="print-btn" onclick="window.print()">🖨️ Печать</button>
+        </div>
+    </div>
+    
+    <script>
+        function generateQR() {
+            const url = document.getElementById('ar-url').value.trim();
+            
+            if (!url) {
+                alert('❌ Введите ссылку!');
+                return;
+            }
+            
+            let finalUrl = url;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                finalUrl = 'https://' + url;
+            }
+            
+            if (!finalUrl.endsWith('/index.html') && !finalUrl.endsWith('.html')) {
+                if (!finalUrl.endsWith('/')) finalUrl += '/';
+                finalUrl += 'index.html';
+            }
+            
+            document.getElementById('qrcode').innerHTML = '';
+            
+            new QRCode(document.getElementById('qrcode'), {
+                text: finalUrl,
+                width: 300,
+                height: 300,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            document.getElementById('qr-container').classList.add('show');
+            document.getElementById('url-display').textContent = finalUrl;
+        }
+    </script>
+</body>
+</html>
+
