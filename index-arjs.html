@@ -43,15 +43,13 @@
             color: white;
         }
         
-        /* Скрываем все debug элементы AR.js */
-        .arjs-debug,
-        .arjs-debugUI,
-        [data-arjs],
-        canvas[data-arjs] {
+        /* Скрываем только некоторые debug элементы AR.js */
+        .a-enter-vr-button,
+        .a-orientation-modal {
             display: none !important;
         }
         
-        /* Скрываем круги и другие debug элементы */
+        /* Показываем canvas */
         a-scene canvas {
             display: block !important;
         }
@@ -79,10 +77,18 @@
         vr-mode-ui="enabled: false"
         renderer="logarithmicDepthBuffer: true;"
         embedded
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; videoTexture: true;"
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3; cameraParametersUrl: https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/camera_para.dat; maxDetectionRate: 60; canvasWidth: 640; canvasHeight: 480;"
     >
         <!-- Маркер Hiro (распечатайте маркер) -->
-        <a-marker preset="hiro" raycaster="objects: .clickable" emitevents="true">
+        <a-marker 
+            preset="hiro"
+            raycaster="objects: .clickable" 
+            emitevents="true"
+            size="1"
+            smooth="true"
+            smoothCount="10"
+            smoothTolerance="0.01"
+            smoothThreshold="5">
             <!-- Видео голограмма на маркере -->
             <a-video
                 src="#video-source"
@@ -164,33 +170,69 @@
         const info = document.getElementById('info');
         
         scene.addEventListener('loaded', function() {
-            console.log('A-Frame сцена загружена');
+            console.log('✅ A-Frame сцена загружена');
+            console.log('AR.js версия:', AFRAME.components['arjs'] ? 'загружена' : 'не загружена');
+            
+            // Проверяем что AR.js загружен
+            if (typeof ARjs !== 'undefined') {
+                console.log('✅ AR.js библиотека загружена');
+            } else {
+                console.error('❌ AR.js библиотека не загружена!');
+            }
+            
             setTimeout(() => {
                 if (loader) {
                     loader.style.display = 'none';
                 }
                 if (info) {
-                    info.textContent = '✅ AR готов! Наведите на маркер или используйте маркерлесс режим';
+                    info.textContent = '✅ AR готов! Наведите на маркер Hiro (распечатайте с marker.html)';
                 }
-            }, 1000);
+            }, 2000);
+        });
+        
+        // Дополнительная проверка загрузки AR.js
+        window.addEventListener('arjs-video-loaded', function() {
+            console.log('✅ AR.js видео загружено');
         });
         
         // Обработка маркера
         const marker = document.querySelector('a-marker');
         if (marker) {
+            console.log('Маркер найден в DOM');
+            
             marker.addEventListener('markerFound', function() {
-                console.log('Маркер найден!');
+                console.log('✅ Маркер найден!');
                 if (info) {
                     info.textContent = '✅ Маркер найден! Голограмма активна';
+                }
+                // Показываем видео элемент
+                const videoElement = marker.querySelector('a-video');
+                if (videoElement) {
+                    videoElement.setAttribute('visible', 'true');
+                    console.log('Видео элемент показан');
                 }
             });
             
             marker.addEventListener('markerLost', function() {
-                console.log('Маркер потерян');
+                console.log('❌ Маркер потерян');
                 if (info) {
                     info.textContent = 'Наведите камеру на маркер Hiro';
                 }
             });
+            
+            // Дополнительная проверка через setInterval
+            let markerCheckInterval = setInterval(function() {
+                if (marker.object3D.visible) {
+                    console.log('Маркер видим через object3D');
+                }
+            }, 1000);
+            
+            // Останавливаем проверку через 30 секунд
+            setTimeout(function() {
+                clearInterval(markerCheckInterval);
+            }, 30000);
+        } else {
+            console.error('Маркер не найден в DOM!');
         }
         
         // Запуск видео сразу при загрузке
